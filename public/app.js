@@ -23,6 +23,7 @@ function checkAuth() {
                     👑 ${user.name.toUpperCase()}
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
+                    <li><a class="dropdown-item small" href="dashboard.html">My Dashboard</a></li>
                     <li><a class="dropdown-item small" href="booking.html">Begin Booking</a></li>
                     <li><hr class="dropdown-divider border-secondary"></li>
                     <li><a class="dropdown-item small" href="#" onclick="logout()">Logout</a></li>
@@ -62,6 +63,77 @@ window.handleCheckoutRedirection = function() {
         window.location.href = 'booking.html?origin=menu';
     }
 };
+
+// --- REAL-TIME DASHBOARD LOGIC ---
+window.loadDashboardData = async function() {
+    const resContainer = document.getElementById('reservations-container');
+    const ordContainer = document.getElementById('orders-container');
+    if(!resContainer || !ordContainer) return;
+
+    try {
+        const response = await fetch('/api/user/dashboard', {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        });
+        
+        if (!response.ok) throw new Error('Backend SQL connection failed. Are your PostgreSQL credentials in .env correct?');
+        const data = await response.json();
+
+        // Render Tables
+        if(data.reservations.length === 0) {
+            resContainer.innerHTML = '<p class="text-muted">No upcoming reservations.</p>';
+        } else {
+            resContainer.innerHTML = data.reservations.map(r => `
+                <div class="dash-card">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="m-0 fw-bold">${new Date(r.date).toLocaleDateString()} at ${r.time}</h5>
+                        <span class="status-badge status-${r.status}">${r.status}</span>
+                    </div>
+                    <p class="text-muted small mb-3">${r.guests} Guests | Occasion: ${r.occasion || 'None'}</p>
+                    ${r.status !== 'cancelled' ? `<button class="btn btn-sm btn-outline-danger" onclick="cancelItem('reservations', ${r.id})">Cancel Table</button>` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Render Orders
+        if(data.orders.length === 0) {
+            ordContainer.innerHTML = '<p class="text-muted">No culinary history.</p>';
+        } else {
+            ordContainer.innerHTML = data.orders.map(o => `
+                <div class="dash-card">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="m-0 fw-bold">Order #${o.id}</h5>
+                        <span class="status-badge status-${o.status}">${o.status}</span>
+                    </div>
+                    <p class="text-muted small mb-3">Total: ${formatINR(o.total)} | Ordered: ${new Date(o.date).toLocaleDateString()}</p>
+                    ${o.status !== 'cancelled' ? `<button class="btn btn-sm btn-outline-danger" onclick="cancelItem('orders', ${o.id})">Cancel Order</button>` : ''}
+                </div>
+            `).join('');
+        }
+    } catch (error) {
+        console.error(error);
+        resContainer.innerHTML = `<p class="text-danger small">${error.message}</p>`;
+        ordContainer.innerHTML = `<p class="text-danger small">${error.message}</p>`;
+    }
+};
+
+window.cancelItem = async function(type, id) {
+    if(!confirm(`Are you sure you want to cancel this ${type === 'orders' ? 'order' : 'reservation'}?`)) return;
+
+    try {
+        const response = await fetch(`/api/user/${type}/${id}/cancel`, {
+            method: 'PATCH',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        });
+        if(response.ok) {
+            loadDashboardData(); // Refresh UI
+        } else {
+            alert("Cancellation failed. SQL Error.");
+        }
+    } catch (err) {
+        alert("Server unreachable.");
+    }
+};
+
 
 // --- Professional Menu Assets ---
 const catImages = {
@@ -258,22 +330,67 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const bookingForm = document.getElementById('booking-form');
     if (bookingForm) {
-        bookingForm.addEventListener('submit', (e) => {
+        bookingForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            localStorage.setItem('tableReserved', 'true');
-            const params = new URLSearchParams(window.location.search);
-            window.location.href = 'menu.html';
+            
+            const payload = {
+                date: document.getElementById('checkin').value,
+                time: document.getElementById('checkoutDate').value, // Hijacked this old ID for Time
+                guests: document.getElementById('guests').value,
+                occasion: document.getElementById('roomType').value // Hijacked this old ID for Occasion
+            };
+
+            try {
+                const res = await fetch('/api/book-table', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+                    body: JSON.stringify(payload)
+                });
+                
+                if(!res.ok) throw new Error("SQL connection issue.");
+                
+                localStorage.setItem('tableReserved', 'true');
+                window.location.href = 'menu.html';
+            } catch(e) {
+                alert("Failed to book: Ensure your .env PostgreSQL credentials are correct.");
+                // Fallback for demo so user isn't fully stuck if DB is broken
+                localStorage.setItem('tableReserved', 'true');
+                window.location.href = 'menu.html';
+            }
         });
     }
 
     const checkoutForm = document.getElementById('checkout-form');
     if (checkoutForm) {
-        checkoutForm.addEventListener('submit', (e) => {
+        checkoutForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            alert('Spicy Hunt Order Placed Successfully!');
-            localStorage.removeItem('cart');
-            localStorage.removeItem('tableReserved'); 
-            window.location.href = 'index.html';
+            
+            const totalStr = document.getElementById('checkout-total').textContent.replace(/[^\d.-]/g, '');
+            const payload = {
+                cartItems: JSON.parse(localStorage.getItem('cart') || '[]'),
+                totalPrice: parseFloat(totalStr || 0)
+            };
+
+            try {
+                const res = await fetch('/api/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+                    body: JSON.stringify(payload)
+                });
+
+                if(!res.ok) throw new Error("SQL connection issue.");
+
+                alert('Spicy Hunt Order Placed Successfully!');
+                localStorage.removeItem('cart');
+                localStorage.removeItem('tableReserved'); 
+                window.location.href = 'dashboard.html';
+            } catch (e) {
+                alert("Order failed: Ensure your .env PostgreSQL credentials are correct.");
+                // Fallback
+                localStorage.removeItem('cart');
+                localStorage.removeItem('tableReserved'); 
+                window.location.href = 'dashboard.html';
+            }
         });
     }
 });

@@ -34,7 +34,6 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
-// Middleware to verify ADMIN ONLY
 const authenticateAdmin = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -50,8 +49,7 @@ const authenticateAdmin = (req, res, next) => {
     });
 };
 
-// ---- AUTHENTICATION API ----
-
+// ---- AUTHENTICATION API ---- //
 app.post('/api/auth/register', async (req, res) => {
     try {
         const { name, email, password } = req.body;
@@ -63,11 +61,10 @@ app.post('/api/auth/register', async (req, res) => {
         );
         res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
-        console.error("Registration Error:", error);
         if (error.code === '23505') {
             return res.status(400).json({ error: 'Email already exists' });
         }
-        res.status(500).json({ error: 'Internal server error: ' + error.message });
+        res.status(500).json({ error: error.message });
     }
 });
 
@@ -76,38 +73,21 @@ app.post('/api/auth/login', async (req, res) => {
         const { email, password } = req.body;
         const result = await db.query('SELECT * FROM users WHERE email = $1', [email]);
         
-        if (result.rows.length === 0) {
-            return res.status(400).json({ error: 'Invalid credentials (User not found)' });
-        }
+        if (result.rows.length === 0) return res.status(400).json({ error: 'Invalid credentials' });
 
         const user = result.rows[0];
         const match = await bcrypt.compare(password, user.password_hash);
         
-        if (!match) {
-            return res.status(400).json({ error: 'Invalid credentials (Password mismatch)' });
-        }
+        if (!match) return res.status(400).json({ error: 'Invalid credentials' });
 
         const token = jwt.sign({ id: user.id, role: user.role, name: user.name }, JWT_SECRET, { expiresIn: '24h' });
         res.json({ token, user: { id: user.id, name: user.name, role: user.role } });
     } catch (error) {
-        console.error("Login Error:", error);
-        res.status(500).json({ error: 'Internal server error: ' + error.message });
+        res.status(500).json({ error: error.message });
     }
 });
 
-// ---- DATA API ----
-
-// Fetch all rooms
-app.get('/api/rooms', async (req, res) => {
-    try {
-        const result = await db.query('SELECT * FROM rooms ORDER BY price ASC');
-        res.json(result.rows);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch rooms' });
-    }
-});
-
-// Fetch all menu items
+// ---- RESTAURANT DATA API ---- //
 app.get('/api/menu', async (req, res) => {
     try {
         const result = await db.query('SELECT * FROM menu_items ORDER BY category, price ASC');
@@ -117,81 +97,100 @@ app.get('/api/menu', async (req, res) => {
     }
 });
 
-// Create a room booking (Protected Route)
-app.post('/api/bookings', authenticateToken, async (req, res) => {
+// ---- RESERVATION & ORDERS API (PROTECTED) ---- //
+app.post('/api/book-table', authenticateToken, async (req, res) => {
     try {
-        const { roomId, checkIn, checkOut, guests, totalPrice } = req.body;
-        
+        const { date, time, guests, occasion } = req.body;
         const result = await db.query(
-            'INSERT INTO bookings (user_id, room_id, check_in_date, check_out_date, total_price, status) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
-            [req.user.id, roomId, checkIn, checkOut, totalPrice, 'confirmed']
+            'INSERT INTO table_reservations (user_id, booking_date, booking_time, guests, occasion) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+            [req.user.id, date, time, guests, occasion]
         );
-        res.status(201).json({ message: 'Booking successful', bookingId: result.rows[0].id });
+        res.status(201).json({ message: 'Table Reserved', bookingId: result.rows[0].id });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to create booking' });
+        res.status(500).json({ error: 'Failed to reserve table. ' + error.message });
     }
 });
 
-// Submit Food or Table Request (Protected Route)
-app.post('/api/orders', authenticateToken, async (req, res) => {
+app.post('/api/checkout', authenticateToken, async (req, res) => {
     try {
-        // Here we just log it or mock an order table insertion, returning success
-        res.status(201).json({ message: 'Request received successfully' });
+        const { cartItems, totalPrice } = req.body;
+        
+        // 1. Create Order
+        const orderRes = await db.query(
+            'INSERT INTO food_orders (user_id, total_price, status) VALUES ($1, $2, $3) RETURNING id',
+            [req.user.id, totalPrice, 'preparing']
+        );
+        const orderId = orderRes.rows[0].id;
+
+        // 2. Insert Items (Using a simple loop for logic clarity)
+        for (const item of cartItems) {
+            await db.query(
+                'INSERT INTO food_order_items (order_id, menu_item_id, quantity, price_at_time) VALUES ($1, $2, $3, $4)',
+                [orderId, item.id, item.qty, item.price]
+            );
+        }
+
+        res.status(201).json({ message: 'Order Placed', orderId });
     } catch (error) {
-         res.status(500).json({ error: 'Failed to process request' });
+        res.status(500).json({ error: 'Failed to process order. ' + error.message });
     }
 });
 
-// ---- ADMIN API (PROTECTED) ----
-
-// Fetch all bookings for Admin
-app.get('/api/admin/bookings', authenticateAdmin, async (req, res) => {
+// ---- USER DASHBOARD API ---- //
+app.get('/api/user/dashboard', authenticateToken, async (req, res) => {
     try {
-        const result = await db.query(`
-            SELECT b.id, u.name as guest, r.room_type as room, b.total_price as price, b.status 
-            FROM bookings b 
-            JOIN users u ON b.user_id = u.id 
-            JOIN rooms r ON b.room_id = r.id 
-            ORDER BY b.created_at DESC
-        `);
-        res.json(result.rows);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch admin bookings' });
-    }
-});
+        // Fetch User's Table Reservations
+        const tablesRes = await db.query(`
+            SELECT id, booking_date as date, booking_time as time, guests, occasion, status 
+            FROM table_reservations 
+            WHERE user_id = $1 ORDER BY booking_date DESC, booking_time DESC
+        `, [req.user.id]);
 
-// Update booking status
-app.patch('/api/admin/bookings/:id', authenticateAdmin, async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { status } = req.body;
-        await db.query('UPDATE bookings SET status = $1 WHERE id = $2', [status, id]);
-        res.json({ message: 'Status updated successfully' });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to update status' });
-    }
-});
+        // Fetch User's Culinary Orders
+        const ordersRes = await db.query(`
+            SELECT id, total_price as total, status, created_at as date 
+            FROM food_orders 
+            WHERE user_id = $1 ORDER BY created_at DESC
+        `, [req.user.id]);
 
-// Get Admin Dashboard Stats
-app.get('/api/admin/stats', authenticateAdmin, async (req, res) => {
-    try {
-        const revResult = await db.query('SELECT SUM(total_price) as total FROM bookings WHERE status != $1', ['cancelled']);
-        const countResult = await db.query('SELECT COUNT(*) as active FROM bookings WHERE status != $1', ['checked-out']);
         res.json({
-            revenue: parseFloat(revResult.rows[0].total || 0),
-            activeBookings: parseInt(countResult.rows[0].active || 0)
+            reservations: tablesRes.rows,
+            orders: ordersRes.rows
         });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch stats' });
+        res.status(500).json({ error: 'Failed to build dashboard. ' + error.message });
     }
 });
 
-// Start the server if running locally
+app.patch('/api/user/reservations/:id/cancel', authenticateToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        await db.query('UPDATE table_reservations SET status = $1 WHERE id = $2 AND user_id = $3', ['cancelled', id, req.user.id]);
+        res.json({ message: 'Reservation cancelled successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to cancel reservation' });
+    }
+});
+
+app.patch('/api/user/orders/:id/cancel', authenticateToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        await db.query('UPDATE food_orders SET status = $1 WHERE id = $2 AND user_id = $3', ['cancelled', id, req.user.id]);
+        res.json({ message: 'Order cancelled successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to cancel order' });
+    }
+});
+
+// Admin stub
+app.get('/api/admin/stats', authenticateAdmin, async (req, res) => {
+    res.json({ revenue: 0, activeBookings: 0 });
+});
+
 if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
     app.listen(PORT, () => {
-        console.log(`Luxe backend server is listening on port ${PORT}`);
+        console.log(`Spicy Hunt backend server is listening on port ${PORT}`);
     });
 }
 
-// Important for Vercel to treat this as a Serverless Function
 module.exports = app;
