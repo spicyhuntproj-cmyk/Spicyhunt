@@ -50,20 +50,30 @@ const authenticateAdmin = (req, res, next) => {
 };
 
 // ---- AUTHENTICATION API ---- //
+let memUsers = [
+    // Pre-populate a guest user in memory so they can login immediately if DB is dead
+    { id: 999, name: 'Guest User', email: 'guest@spicyhunt.com', password_hash: bcrypt.hashSync('password123', 10), role: 'user' }
+];
+
 app.post('/api/auth/register', async (req, res) => {
     try {
         const { name, email, password } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
         
-        await db.query(
-            'INSERT INTO users (name, email, password_hash, role) VALUES ($1, $2, $3, $4)',
-            [name, email, hashedPassword, 'user']
-        );
-        res.status(201).json({ message: 'User registered successfully' });
-    } catch (error) {
-        if (error.code === '23505') {
-            return res.status(400).json({ error: 'Email already exists' });
+        try {
+            await db.query(
+                'INSERT INTO users (name, email, password_hash, role) VALUES ($1, $2, $3, $4)',
+                [name, email, hashedPassword, 'user']
+            );
+            return res.status(201).json({ message: 'User registered successfully' });
+        } catch (dbErr) {
+            if (dbErr.code === '23505') return res.status(400).json({ error: 'Email already exists' });
+            console.warn("SQL Failed (Register). Falling back to Memory");
+            if(memUsers.find(u => u.email === email)) return res.status(400).json({error: 'Email already exists'});
+            memUsers.push({ id: memUsers.length + 1000, name, email, password_hash: hashedPassword, role: 'user' });
+            return res.status(201).json({ message: 'User registered successfully (Memory)' });
         }
+    } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
@@ -71,17 +81,23 @@ app.post('/api/auth/register', async (req, res) => {
 app.post('/api/auth/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-        const result = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+        let matchUser = null;
         
-        if (result.rows.length === 0) return res.status(400).json({ error: 'Invalid credentials' });
+        try {
+            const result = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+            if (result.rows.length > 0) matchUser = result.rows[0];
+        } catch(dbErr) {
+            console.warn("SQL Failed (Login). Falling back to Memory");
+            matchUser = memUsers.find(u => u.email === email);
+        }
+        
+        if (!matchUser) return res.status(400).json({ error: 'Invalid credentials' });
 
-        const user = result.rows[0];
-        const match = await bcrypt.compare(password, user.password_hash);
-        
+        const match = await bcrypt.compare(password, matchUser.password_hash);
         if (!match) return res.status(400).json({ error: 'Invalid credentials' });
 
-        const token = jwt.sign({ id: user.id, role: user.role, name: user.name }, JWT_SECRET, { expiresIn: '24h' });
-        res.json({ token, user: { id: user.id, name: user.name, role: user.role } });
+        const token = jwt.sign({ id: matchUser.id, role: matchUser.role, name: matchUser.name }, JWT_SECRET, { expiresIn: '24h' });
+        return res.json({ token, user: { id: matchUser.id, name: matchUser.name, role: matchUser.role } });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
