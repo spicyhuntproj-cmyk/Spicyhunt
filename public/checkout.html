@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Royal Checkout | Spicy Hunt</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand brand-logo fs-3" href="index.html" style="color:var(--accent-color);">Spicy Hunt</a>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="index.html">The Story</a></li>
+                    <li class="nav-item"><a class="nav-link" href="menu.html">The Menu</a></li>
+                    <li class="nav-item"><a class="nav-link" href="booking.html">Reservations</a></li>
+                    <li class="nav-item ms-lg-3" id="auth-nav-item">
+                        <a class="btn btn-outline-warning rounded-pill px-4 btn-sm" href="login.html">Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- PERFECTED PROGRESS INDICATOR -->
+    <div class="container mt-5">
+        <div class="booking-progress">
+            <div class="progress-step">1. Table</div>
+            <div class="progress-line"></div>
+            <div class="progress-step">2. Feast Selection</div>
+            <div class="progress-line"></div>
+            <div class="progress-step active">3. Royal Checkout</div>
+        </div>
+    </div>
+
+    <!-- MAIN CHECKOUT SECTION -->
+    <div class="container mb-5 py-5">
+        <div class="row g-5">
+            <!-- Royal Bill (Order Summary) -->
+            <div class="col-lg-7">
+                <div class="checkout-summary-panel reveal visible" style="opacity: 1; transform: translateY(0);">
+                    <div class="text-center mb-5">
+                        <img src="royal_crest_gold.png" alt="Royal Crest" style="width: 100px; filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.4));" class="mb-4">
+                        <h2 class="brand-logo fs-2">The Royal Bill</h2>
+                        <p class="text-muted small">CONFIRMATION OF YOUR CURATED FEAST</p>
+                    </div>
+
+                    <!-- Items Container -->
+                    <div id="checkout-items" class="mb-5">
+                        <!-- Filled dynamically by app.js -->
+                    </div>
+
+                    <!-- Bill Total Section -->
+                    <div class="total-row d-flex justify-content-between align-items-center">
+                        <h3 class="brand-logo fs-3 m-0">Bill Grand Total</h3>
+                        <div class="text-end">
+                            <span class="price-tag fs-2" id="checkout-total">₹0</span>
+                            <div class="text-muted small">INCLUSIVE OF ALL ROYAL TAXES</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Details Panel -->
+            <div class="col-lg-5">
+                <div class="bg-white p-5 rounded-5 shadow-lg border h-100">
+                    <h4 class="brand-logo mb-4">Guest Confirmation</h4>
+                    <form id="checkout-form">
+                        <div class="mb-4">
+                            <label class="form-label text-uppercase small fw-bold">Full Name</label>
+                            <input type="text" class="form-control rounded-pill p-3 border-light bg-light" placeholder="e.g., His Highness Arjun Singh" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-uppercase small fw-bold">Contact Number</label>
+                            <input type="tel" class="form-control rounded-pill p-3 border-light bg-light" placeholder="+91 10-digit number" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-uppercase small fw-bold">Special Dietary Requests</label>
+                            <textarea class="form-control rounded-4 p-3 border-light bg-light" rows="3" placeholder="Any spice preferences or allergies?"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary-custom w-100 py-3 mt-4">Confirm Order & Reserve</button>
+                        <p class="text-center text-muted small mt-4">By confirming, you agree to our royal hosting terms.</p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Final Restaurant Footer -->
+    <footer class="text-center text-lg-start mt-5">
+        <div class="container text-center">
+            <h5 class="brand-logo fs-4 mb-3" style="color:var(--accent-color)">SPIĆY HUNT</h5>
+            <p class="text-muted small">CURATING THE SOUL OF INDIAN HERITAGE SINCE 1924</p>
+            <div class="mb-4">
+                <a href="index.html" class="text-muted mx-3 text-decoration-none small">The Story</a>
+                <a href="menu.html" class="text-muted mx-3 text-decoration-none small">The Menu</a>
+                <a href="booking.html" class="text-muted mx-3 text-decoration-none small">Reservations</a>
+            </div>
+            <p class="small text-muted border-top border-secondary pt-3">© 2026 SPICY HUNT CULINARY GROUP | NEW DELHI</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

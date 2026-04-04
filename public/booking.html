@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserve a Table | Spicy Hunt</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .booking-card {
+            border: none;
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(139, 0, 0, 0.1);
+            padding: 50px;
+            background-color: white;
+            margin-top: 80px;
+            margin-bottom: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+        .booking-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 5px;
+            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+        }
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 1px solid #eee;
+            padding: 12px 15px;
+            background-color: #fafafa;
+        }
+        .form-control:focus, .form-select:focus {
+            box-shadow: 0 0 10px rgba(139, 0, 0, 0.1);
+            border-color: var(--primary-color);
+            background-color: white;
+        }
+    </style>
+</head>
+<body style="background: linear-gradient(rgba(255, 251, 240, 0.9), rgba(255, 251, 240, 0.9)), url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover fixed;">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark position-sticky top-0 w-100" style="z-index: 1000;">
+        <div class="container">
+            <a class="navbar-brand brand-logo fs-3" href="index.html">Spicy Hunt</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="index.html">The Story</a></li>
+                    <li class="nav-item"><a class="nav-link" href="menu.html">The Menu</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="booking.html" style="color:var(--accent-color)!important;">Reservations</a></li>
+                    <li class="nav-item ms-lg-3" id="auth-nav-item">
+                        <a class="btn btn-outline-warning rounded-pill px-4 btn-sm" href="login.html">Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Table Booking Form -->
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="booking-card">
+                    <div class="text-center mb-5">
+                        <h2 class="brand-logo mb-2">Secure Your Table</h2>
+                        <p class="text-muted">Join us for an unforgettable spice-led adventure.</p>
+                    </div>
+                    
+                    <form id="booking-form">
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-uppercase small" style="letter-spacing: 1px;">Date</label>
+                                <input type="date" class="form-control" required id="booking-date">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-uppercase small" style="letter-spacing: 1px;">Time</label>
+                                <select class="form-select" required id="booking-time">
+                                    <option value="" selected disabled>Select Slot</option>
+                                    <option>12:30 PM - Lunch</option>
+                                    <option>01:30 PM - Lunch</option>
+                                    <option>07:00 PM - Dinner</option>
+                                    <option>08:30 PM - Dinner</option>
+                                    <option>10:00 PM - Late Night</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-uppercase small" style="letter-spacing: 1px;">Number of Guests</label>
+                                <input type="number" class="form-control" min="1" max="20" placeholder="e.g. 4" required id="guests">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-uppercase small" style="letter-spacing: 1px;">Occasion</label>
+                                <select class="form-select" id="occasion">
+                                    <option selected>Birthday</option>
+                                    <option>Anniversary</option>
+                                    <option>Business Meeting</option>
+                                    <option>Date Night</option>
+                                    <option>Just Dining</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row g-4 mb-5">
+                             <div class="col-md-12">
+                                <label class="form-label fw-bold text-uppercase small" style="letter-spacing: 1px;">Full Name</label>
+                                <input type="text" class="form-control" placeholder="Royal Guest Name" required>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary-custom btn-lg w-100">Next: Pre-order Your Flavors</button>
+                            <p class="mt-3 text-muted small"><i class="bi bi-info-circle"></i> Redirecting to menu for meal selection after table confirmation.</p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center p-3" style="background: #1a0000; color: white;">
+        © 2026 Spicy Hunt Restaurant
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guest Login | Spicy Hunt</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .login-panel {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(15px);
+            border-radius: 40px;
+            padding: 60px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        .login-panel::before {
+            content: '';
+            position: absolute;
+            top: 15px; left: 15px; right: 15px; bottom: 15px;
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            border-radius: 30px;
+            pointer-events: none;
+        }
+        .form-control-royal {
+            background: #FFFBF0;
+            border: 1px solid rgba(139, 0, 0, 0.1);
+            border-radius: 50px;
+            padding: 15px 25px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        .form-control-royal:focus {
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+            border-color: var(--gold-accent);
+            background: white;
+        }
+    </style>
+</head>
+<body style="background: linear-gradient(rgba(18, 0, 0, 0.5), rgba(18, 0, 0, 0.7)), url('spiced_interior_hero_1_1775318417656.png') center/cover fixed;">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark position-absolute w-100" style="z-index: 1000; background: transparent !important;">
+        <div class="container">
+            <a class="navbar-brand brand-logo fs-3" href="index.html" style="color:white !important; letter-spacing: 12px;">SPIĆY HUNT</a>
+        </div>
+    </nav>
+
+    <!-- Login Container -->
+    <div class="container d-flex align-items-center justify-content-center min-vh-100">
+        <div class="row w-100 justify-content-center">
+            <div class="col-md-7 col-lg-5">
+                <div class="login-panel reveal visible" style="opacity: 1; transform: translateY(0);">
+                    <!-- Royal Crest Mockup -->
+                    <div class="text-center mb-5">
+                        <img src="royal_crest_gold.png" alt="Royal Crest" style="width: 80px; filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.3));" class="mb-4">
+                        <h2 class="brand-logo fs-2" style="color: var(--primary-color);">GUEST LOGIN</h2>
+                        <p class="text-muted small">ENTER THE ROYAL CULINARY ARCHIVE</p>
+                    </div>
+
+                    <form id="login-form">
+                        <div class="mb-4">
+                            <label class="form-label text-uppercase small fw-bold">Royal Email</label>
+                            <input type="email" class="form-control form-control-royal" placeholder="your@email.com" required>
+                        </div>
+                        <div class="mb-5">
+                            <label class="form-label text-uppercase small fw-bold">Secret Key</label>
+                            <input type="password" class="form-control form-control-royal" placeholder="••••••••" required>
+                        </div>
+                        
+                        <div class="text-center mb-4">
+                            <button type="submit" class="btn btn-primary-custom w-100 py-3 rounded-pill fs-6">Sign In to Feast</button>
+                        </div>
+                        
+                        <div class="text-center">
+                            <p class="text-muted small">
+                                New to the Hunt? <a href="#" class="text-decoration-none fw-bold" style="color: var(--accent-color);">Request Access</a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+    <script>
+        // REDIRECTION LOGIC ON SUBMIT (Mock bypass)
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Mock authentication
+            localStorage.setItem('token', 'mock_spicy_token');
+            localStorage.setItem('user', JSON.stringify({ name: 'Honored Guest', role: 'guest' }));
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>

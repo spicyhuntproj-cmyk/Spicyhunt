@@ -1,0 +1,231 @@
+:root {
+  --primary-color: #8B0000; /* Deep Crimson */
+  --accent-color: #FF8C00; /* Spiced Orange */
+  --gold-accent: #D4AF37; /* Branded Gold */
+  --light-bg: #FFFBF0; /* Warm Cream */
+  --dark-text: #2c2c2c;
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --deep-dark: #120000; /* Midnight Crimson */
+  --glass-perfect: rgba(255, 255, 255, 0.88);
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--light-bg);
+  background-image: url('https://www.transparenttextures.com/patterns/handmade-paper.png'); 
+  background-attachment: fixed;
+  color: var(--dark-text);
+  line-height: 1.6;
+}
+
+/* NAVBAR & BRANDING */
+.navbar {
+  background: linear-gradient(135deg, #4A0000 0%, #8B0000 50%, #4A0000 100%) !important;
+  backdrop-filter: blur(25px);
+  padding: 1.25rem 0;
+  border-bottom: 2px solid var(--gold-accent);
+  box-shadow: 0 8px 32px rgba(139, 0, 0, 0.4);
+}
+
+.brand-logo {
+  letter-spacing: 12px !important;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--primary-color); /* Default to Deep Crimson for luxury feel */
+  text-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
+}
+
+.navbar .brand-logo,
+.hero-carousel .brand-logo {
+  color: white !important;
+  text-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+}
+
+/* PERFECTED HERO */
+.hero-carousel {
+  background-color: black;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+.hero-carousel .carousel-item {
+  height: 90vh;
+}
+
+.hero-carousel img {
+  object-fit: cover;
+  height: 100%;
+  width: 100%;
+  filter: brightness(0.4) contrast(1.1) saturate(1.1);
+  transition: transform 15s cubic-bezier(0, 0, 0.2, 1);
+}
+
+.carousel-item.active img {
+  transform: scale(1.15);
+}
+
+/* STRUCTURAL PANEL SYSTEM */
+.menu-structure-panel {
+  background: var(--glass-perfect);
+  backdrop-filter: blur(10px);
+  border-radius: 40px;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  box-shadow: 0 40px 100px rgba(139, 0, 0, 0.08);
+  overflow: hidden;
+  margin-top: 60px;
+}
+
+.menu-category {
+  background: linear-gradient(to right, #4A0000, #8B0000);
+  color: #FFFBF0;
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  letter-spacing: 3px;
+  border-bottom: 3px solid var(--gold-accent);
+}
+
+/* PERFECTED DISH CARDS */
+.dish-card-perfect {
+  background: white;
+  border-radius: 30px;
+  border: none;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+  transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+  overflow: hidden;
+  height: 100%;
+  position: relative;
+}
+
+.dish-card-perfect:hover {
+  transform: translateY(-15px);
+  box-shadow: 0 35px 80px rgba(139, 0, 0, 0.12);
+}
+
+.dish-img-container {
+  overflow: hidden;
+  position: relative;
+}
+
+.dish-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.dish-card-perfect:hover .dish-img {
+  transform: scale(1.12);
+}
+
+.glass-badge {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(139, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  color: var(--gold-accent);
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+/* BUTTONS & QUANTITY SELECTOR */
+.btn-primary-custom {
+  background: linear-gradient(135deg, #8B0000 0%, #FF8C00 100%);
+  border: none;
+  color: white !important;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 2px;
+  padding: 18px 40px;
+  border-radius: 50px;
+  box-shadow: 0 12px 35px rgba(139, 0, 0, 0.45);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-primary-custom:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 18px 45px rgba(139, 0, 0, 0.65);
+}
+
+.btn-qty {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: 2px solid var(--primary-color);
+  background: white;
+  color: var(--primary-color);
+  font-weight: 900;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  line-height: 1;
+  padding: 0;
+}
+
+.btn-qty:hover {
+  background: var(--primary-color);
+  color: white;
+  transform: scale(1.1);
+}
+
+/* CHECKOUT SUMMARY PANEL */
+.checkout-summary-panel {
+  background: white;
+  border-radius: 30px;
+  padding: 50px;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  box-shadow: 0 40px 120px rgba(0,0,0,0.1);
+  position: relative;
+}
+
+.checkout-summary-panel::before {
+  content: '';
+  position: absolute;
+  top: 15px; left: 15px; right: 15px; bottom: 15px;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 20px;
+  pointer-events: none;
+}
+
+.total-row {
+  border-top: 4px double var(--gold-accent);
+  padding-top: 30px;
+  margin-top: 30px;
+}
+
+/* PROGRESS INDICATOR */
+.booking-progress {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 50px;
+}
+
+.progress-step {
+  padding: 10px 25px;
+  border-radius: 50px;
+  background: white;
+  color: #AAA;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.progress-step.active {
+  background: var(--primary-color);
+  color: white;
+  box-shadow: 0 10px 25px rgba(139, 0, 0, 0.3);
+}
+
+.progress-line {
+  height: 2px;
+  width: 50px;
+  background: #DDD;
+}

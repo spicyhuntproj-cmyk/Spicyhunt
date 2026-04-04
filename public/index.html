@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spicy Hunt | Royal Indian Gastronomy</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Navbar - RESTAURANT ONLY -->
+    <nav class="navbar navbar-expand-lg navbar-dark position-fixed w-100" style="z-index: 1000;">
+        <div class="container">
+            <a class="navbar-brand brand-logo fs-3" href="index.html" style="color:var(--accent-color);">SPIĆY HUNT</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="index.html">The Story</a></li>
+                    <li class="nav-item"><a class="nav-link" href="menu.html">The Menu</a></li>
+                    <li class="nav-item"><a class="nav-link" href="booking.html" id="nav-book">Reservations</a></li>
+                    <li class="nav-item ms-lg-3" id="auth-nav-item">
+                        <a class="btn btn-outline-warning rounded-pill px-4 btn-sm" href="login.html">Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Professional Hero Carousel -->
+    <div id="heroCarousel" class="carousel slide hero-carousel" data-bs-ride="carousel" data-bs-pause="false">
+        <div class="carousel-inner">
+            <div class="carousel-item active" data-bs-interval="6000">
+                <img src="spiced_interior_hero_1_1775318417656.png" class="d-block w-100" alt="Royal Dining Interior">
+                <div class="carousel-caption">
+                    <h1 class="brand-logo hero-title text-white">SPIĆY HUNT</h1>
+                    <p class="hero-subtitle text-white">Where Royal Heritage Meets Ancient Spiced Arts</p>
+                    <a href="#" onclick="handleBeginJourney(event)" class="btn btn-primary-custom rounded-pill mt-4">Begin the Journey</a>
+                </div>
+            </div>
+            <div class="carousel-item" data-bs-interval="6000">
+                <img src="royal_spices_close_up_2_1775318441733.png" class="d-block w-100" alt="Exotic Spices">
+                <div class="carousel-caption">
+                    <h1 class="brand-logo hero-title text-white">AUTHENTICITY</h1>
+                    <p class="hero-subtitle text-white">A Curated Hunt for the Soul of Spice</p>
+                    <a href="menu.html" class="btn btn-primary-custom rounded-pill mt-4">Explore the Menu</a>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        </button>
+    </div>
+
+    <!-- Our Story Section - Refined for Culinary Excellence -->
+    <section class="py-5 bg-white reveal">
+        <div class="container py-5">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <div class="position-relative">
+                        <img src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" class="img-fluid rounded-5 shadow-lg" alt="The Culinary Hunt">
+                        <div class="position-absolute bottom-0 end-0 p-4 bg-crimson-gradient text-white rounded-5 m-4 shadow-lg d-none d-lg-block">
+                            <h4 class="brand-logo fs-5 mb-0">Since 1924</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5 offset-lg-1">
+                    <h6 class="text-uppercase text-muted fw-bold mb-3" style="letter-spacing: 3px;">Our Royal Legacy</h6>
+                    <h2 class="display-5 brand-logo mb-4">A Relentless Hunt for Flavor</h2>
+                    <p class="lead text-muted mb-4">Founded on the principle of the "Hunt"—a decade-long search across the subcontinent for the rarest spices and most authentic recipes of the Rajputana and Awadhi royalty.</p>
+                    <p class="text-muted">At Spicy Hunt, we don't just cook—we archive history. Every dish served is a masterpiece of precision, using Mathania chillies, pure wild saffron, and techniques preserved for generations. We are not just a restaurant; we are the guardians of Indian culinary legacy.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Professional Signature Dishes -->
+    <section class="py-5 bg-light reveal">
+        <div class="container py-5">
+            <div class="text-center mb-5">
+                <h6 class="text-uppercase text-muted fw-bold mb-2" style="letter-spacing: 4px;">Exclusive Selections</h6>
+                <h2 class="display-4 brand-logo">Signature Masterpieces</h2>
+            </div>
+            <div class="row g-5" id="featured-dishes">
+                <div class="col-md-4">
+                    <div class="dish-card-perfect">
+                        <div class="dish-img-container">
+                            <span class="glass-badge">Royal Favorite</span>
+                            <img src="rajasthani_laal_maas_signature_1775318214346.png" class="dish-img" alt="Laal Maas">
+                        </div>
+                        <div class="card-body p-4 text-center">
+                            <h4 class="brand-logo mb-2">Rajasthani Laal Maas</h4>
+                            <p class="text-muted small mb-4">A fiery masterpiece simmered to perfection in copper pots over slow charcoal fires.</p>
+                            <p class="price-tag mb-4">₹3,400</p>
+                            <a href="menu.html" class="btn btn-outline-dark rounded-pill px-5">View Detail</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="dish-card-perfect">
+                        <div class="dish-img-container">
+                            <span class="glass-badge">Chef's Choice</span>
+                            <img src="awadhi_biryani_signature_1775318352835.png" class="dish-img" alt="Awadhi Biryani">
+                        </div>
+                        <div class="card-body p-4 text-center">
+                            <h4 class="brand-logo mb-2">Awadhi Lamb Biryani</h4>
+                            <p class="text-muted small mb-4">The crown jewel of Lucknow. Aromatic basmati rice and fall-off-the-bone tender lamb.</p>
+                            <p class="price-tag mb-4">₹3,800</p>
+                            <a href="menu.html" class="btn btn-outline-dark rounded-pill px-5">View Detail</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="dish-card-perfect">
+                        <div class="dish-img-container">
+                            <span class="glass-badge">Ultra Premium</span>
+                            <img src="gold_leaf_butter_chicken_signature_1775318389450.png" class="dish-img" alt="Gold Butter Chicken">
+                        </div>
+                        <div class="card-body p-4 text-center">
+                            <h4 class="brand-logo mb-2">Gold-Leaf Butter Chicken</h4>
+                            <p class="text-muted small mb-4">Velvety smoked tomato gravy crowned with authentic pure 24K gold leaf.</p>
+                            <p class="price-tag mb-4">₹2,800</p>
+                            <a href="menu.html" class="btn btn-outline-dark rounded-pill px-5">View Detail</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Professional Testimonials -->
+    <section class="py-5 bg-white reveal">
+        <div class="container py-5 text-center">
+            <h2 class="mb-5 brand-logo display-5">The Connoisseur's Verdict</h2>
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-5">
+                    <div class="review-card h-100">
+                        <div class="text-warning mb-3">★★★★★</div>
+                        <p class="fs-5 fst-italic mb-4 text-secondary">"A standard-bearer for Indian fine dining. The attention to spice profiles is academic, yet the results are soulful and transportive."</p>
+                        <h6 class="brand-logo small">— MR. V. SINGHANIA</h6>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="review-card h-100">
+                        <div class="text-warning mb-3">★★★★★</div>
+                        <p class="fs-5 fst-italic mb-4 text-secondary">"Every visit to Spicy Hunt feels like a royal audience. The seamless journey from reservation to feast is unmatched."</p>
+                        <h6 class="brand-logo small">— DR. ELENA RUSSO</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final Restaurant Footer -->
+    <footer class="text-center text-lg-start">
+        <div class="container text-center">
+            <h5 class="brand-logo footer-logo mb-4" style="color:var(--accent-color)">SPIĆY HUNT</h5>
+            <p class="text-muted small mb-4">CURATING THE SOUL OF INDIAN HERITAGE SINCE 1924</p>
+            <div class="mb-4">
+                <a href="index.html" class="text-muted mx-3 text-decoration-none">Home</a>
+                <a href="menu.html" class="text-muted mx-3 text-decoration-none">Menu</a>
+                <a href="booking.html" class="text-muted mx-3 text-decoration-none">Reserve</a>
+                <a href="tos.html" class="text-muted mx-3 text-decoration-none">Terms</a>
+            </div>
+            <div class="text-muted small border-top border-secondary pt-4">
+                © 2026 SPICY HUNT CULINARY GROUP | NEW DELHI
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Scroll Reveal Logic
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 150;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("visible");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        window.addEventListener("load", reveal);
+
+        // Simplified Flow: Begin Journey Logic
+        function handleBeginJourney(e) {
+            e.preventDefault();
+            const token = localStorage.getItem('token');
+            if (token) {
+                window.location.href = 'booking.html';
+            } else {
+                alert('Please login to begin your royal culinary journey.');
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
+    <script src="app.js"></script>
+</body>
+</html>
