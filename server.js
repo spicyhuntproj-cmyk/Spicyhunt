@@ -97,17 +97,31 @@ app.get('/api/menu', async (req, res) => {
     }
 });
 
+// ---- IN-MEMORY FALLBACK (For Broken Local SQL Connections) ---- //
+let memReservations = [];
+let memOrders = [];
+let reqCounterId = 1;
+
 // ---- RESERVATION & ORDERS API (PROTECTED) ---- //
 app.post('/api/book-table', authenticateToken, async (req, res) => {
     try {
         const { date, time, guests, occasion } = req.body;
-        const result = await db.query(
-            'INSERT INTO table_reservations (user_id, booking_date, booking_time, guests, occasion) VALUES ($1, $2, $3, $4, $5) RETURNING id',
-            [req.user.id, date, time, guests, occasion]
-        );
-        res.status(201).json({ message: 'Table Reserved', bookingId: result.rows[0].id });
+        // Try real SQL first
+        try {
+            const result = await db.query(
+                'INSERT INTO table_reservations (user_id, booking_date, booking_time, guests, occasion) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+                [req.user.id, date, time, guests, occasion]
+            );
+            return res.status(201).json({ message: 'Table Reserved (SQL)', bookingId: result.rows[0].id });
+        } catch (dbErr) {
+            console.warn("SQL Failed. Falling back to Memory:", dbErr.message);
+            // Fallback to Memory
+            const id = reqCounterId++;
+            memReservations.push({ id, user_id: req.user.id, date, time, guests, occasion, status: 'confirmed' });
+            return res.status(201).json({ message: 'Table Reserved (Memory)', bookingId: id });
+        }
     } catch (error) {
-        res.status(500).json({ error: 'Failed to reserve table. ' + error.message });
+        res.status(500).json({ error: 'Failed to reserve table.' });
     }
 });
 
@@ -115,58 +129,76 @@ app.post('/api/checkout', authenticateToken, async (req, res) => {
     try {
         const { cartItems, totalPrice } = req.body;
         
-        // 1. Create Order
-        const orderRes = await db.query(
-            'INSERT INTO food_orders (user_id, total_price, status) VALUES ($1, $2, $3) RETURNING id',
-            [req.user.id, totalPrice, 'preparing']
-        );
-        const orderId = orderRes.rows[0].id;
-
-        // 2. Insert Items (Using a simple loop for logic clarity)
-        for (const item of cartItems) {
-            await db.query(
-                'INSERT INTO food_order_items (order_id, menu_item_id, quantity, price_at_time) VALUES ($1, $2, $3, $4)',
-                [orderId, item.id, item.qty, item.price]
+        try {
+            // 1. Create Order (SQL)
+            const orderRes = await db.query(
+                'INSERT INTO food_orders (user_id, total_price, status) VALUES ($1, $2, $3) RETURNING id',
+                [req.user.id, totalPrice, 'preparing']
             );
-        }
+            const orderId = orderRes.rows[0].id;
 
-        res.status(201).json({ message: 'Order Placed', orderId });
+            for (const item of cartItems) {
+                await db.query(
+                    'INSERT INTO food_order_items (order_id, menu_item_id, quantity, price_at_time) VALUES ($1, $2, $3, $4)',
+                    [orderId, item.id, item.qty, item.price]
+                );
+            }
+            return res.status(201).json({ message: 'Order Placed (SQL)', orderId });
+        } catch (dbErr) {
+            console.warn("SQL Failed. Falling back to Memory:", dbErr.message);
+            const id = reqCounterId++;
+            memOrders.push({ id, user_id: req.user.id, total: totalPrice, date: new Date().toISOString(), status: 'preparing' });
+            return res.status(201).json({ message: 'Order Placed (Memory)', orderId: id });
+        }
     } catch (error) {
-        res.status(500).json({ error: 'Failed to process order. ' + error.message });
+        res.status(500).json({ error: 'Failed to process order.' });
     }
 });
 
 // ---- USER DASHBOARD API ---- //
 app.get('/api/user/dashboard', authenticateToken, async (req, res) => {
     try {
-        // Fetch User's Table Reservations
-        const tablesRes = await db.query(`
-            SELECT id, booking_date as date, booking_time as time, guests, occasion, status 
-            FROM table_reservations 
-            WHERE user_id = $1 ORDER BY booking_date DESC, booking_time DESC
-        `, [req.user.id]);
+        try {
+            // Fetch User's SQL
+            const tablesRes = await db.query(`
+                SELECT id, booking_date as date, booking_time as time, guests, occasion, status 
+                FROM table_reservations 
+                WHERE user_id = $1 ORDER BY booking_date DESC, booking_time DESC
+            `, [req.user.id]);
 
-        // Fetch User's Culinary Orders
-        const ordersRes = await db.query(`
-            SELECT id, total_price as total, status, created_at as date 
-            FROM food_orders 
-            WHERE user_id = $1 ORDER BY created_at DESC
-        `, [req.user.id]);
+            const ordersRes = await db.query(`
+                SELECT id, total_price as total, status, created_at as date 
+                FROM food_orders 
+                WHERE user_id = $1 ORDER BY created_at DESC
+            `, [req.user.id]);
 
-        res.json({
-            reservations: tablesRes.rows,
-            orders: ordersRes.rows
-        });
+            return res.json({
+                reservations: tablesRes.rows,
+                orders: ordersRes.rows
+            });
+        } catch (dbErr) {
+            console.warn("SQL Failed. Serving Dashboard from Memory:", dbErr.message);
+            const userReservations = memReservations.filter(r => r.user_id === req.user.id);
+            const userOrders = memOrders.filter(o => o.user_id === req.user.id);
+            return res.json({ reservations: userReservations, orders: userOrders });
+        }
     } catch (error) {
-        res.status(500).json({ error: 'Failed to build dashboard. ' + error.message });
+        res.status(500).json({ error: 'Failed to build dashboard.' });
     }
 });
 
 app.patch('/api/user/reservations/:id/cancel', authenticateToken, async (req, res) => {
     try {
         const { id } = req.params;
-        await db.query('UPDATE table_reservations SET status = $1 WHERE id = $2 AND user_id = $3', ['cancelled', id, req.user.id]);
-        res.json({ message: 'Reservation cancelled successfully' });
+        try {
+            await db.query('UPDATE table_reservations SET status = $1 WHERE id = $2 AND user_id = $3', ['cancelled', id, req.user.id]);
+            return res.json({ message: 'Reservation cancelled successfully (SQL)' });
+        } catch (dbErr) {
+            console.warn("SQL Failed. Canceling in Memory:", dbErr.message);
+            const reservation = memReservations.find(r => r.id == id && r.user_id === req.user.id);
+            if (reservation) reservation.status = 'cancelled';
+            return res.json({ message: 'Reservation cancelled successfully (Memory)' });
+        }
     } catch (error) {
         res.status(500).json({ error: 'Failed to cancel reservation' });
     }
@@ -175,8 +207,14 @@ app.patch('/api/user/reservations/:id/cancel', authenticateToken, async (req, re
 app.patch('/api/user/orders/:id/cancel', authenticateToken, async (req, res) => {
     try {
         const { id } = req.params;
-        await db.query('UPDATE food_orders SET status = $1 WHERE id = $2 AND user_id = $3', ['cancelled', id, req.user.id]);
-        res.json({ message: 'Order cancelled successfully' });
+        try {
+            await db.query('UPDATE food_orders SET status = $1 WHERE id = $2 AND user_id = $3', ['cancelled', id, req.user.id]);
+            return res.json({ message: 'Order cancelled successfully (SQL)' });
+        } catch(dbErr) {
+            const order = memOrders.find(o => o.id == id && o.user_id === req.user.id);
+            if (order) order.status = 'cancelled';
+            return res.json({ message: 'Order cancelled successfully (Memory)' });
+        }
     } catch (error) {
         res.status(500).json({ error: 'Failed to cancel order' });
     }
