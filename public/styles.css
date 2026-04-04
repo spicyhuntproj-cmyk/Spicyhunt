@@ -28,11 +28,24 @@ body {
 }
 
 .brand-logo {
-  letter-spacing: 12px !important;
+  letter-spacing: 4px; /* Reduced default spacing */
   font-weight: 800;
   text-transform: uppercase;
-  color: var(--primary-color); /* Default to Deep Crimson for luxury feel */
+  color: var(--primary-color);
   text-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
+}
+
+.navbar .brand-logo,
+.hero-carousel .brand-logo,
+.footer-logo,
+h2.brand-logo {
+  letter-spacing: 10px !important; /* Premium spacing only on big elements */
+}
+
+/* Card typography fix */
+.dish-card-perfect .brand-logo,
+.checkout-summary-panel .brand-logo {
+  letter-spacing: 2px !important;
 }
 
 .navbar .brand-logo,
@@ -228,4 +241,42 @@ body {
   height: 2px;
   width: 50px;
   background: #DDD;
+}
+
+/* RESPONSIVE DESIGN METRICS */
+@media (max-width: 768px) {
+  .navbar .brand-logo,
+  h2.brand-logo {
+    letter-spacing: 6px !important;
+    font-size: 1.5rem !important;
+  }
+  
+  .menu-structure-panel {
+    border-radius: 20px;
+    margin-top: 30px;
+  }
+
+  .menu-category {
+    font-size: 1.5rem;
+    padding: 15px !important;
+  }
+
+  .booking-progress {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .progress-line {
+    width: 20px;
+  }
+  
+  .dish-img-container {
+    height: 180px !important;
+  }
+  
+  .login-panel,
+  .checkout-summary-panel {
+    padding: 30px !important;
+    border-radius: 20px;
+  }
 }
