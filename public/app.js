@@ -357,15 +357,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- ROYAL CHECKOUT HANDLER (Supabase Sync) ---
     const checkoutForm = document.getElementById('checkout-form');
     if (checkoutForm) {
         checkoutForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+            const submitBtn = document.getElementById('submit-order');
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Transmitting Royal Order...';
+
             const totalStr = document.getElementById('checkout-total').textContent.replace(/[^\d.-]/g, '');
             const payload = {
                 cartItems: JSON.parse(localStorage.getItem('cart') || '[]'),
-                totalPrice: parseFloat(totalStr || 0)
+                totalPrice: parseFloat(totalStr || 0),
+                notes: document.getElementById('checkout-notes').value || ''
             };
 
             try {
@@ -375,24 +380,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify(payload)
                 });
 
-                if(!res.ok) throw new Error("SQL connection issue.");
+                if(!res.ok) throw new Error("Synchronization Error");
 
                 alert('Spicy Hunt Order Placed Successfully!');
                 localStorage.removeItem('cart');
                 localStorage.removeItem('tableReserved'); 
                 window.location.href = 'dashboard.html';
             } catch (e) {
-                alert("Order failed: Ensure your .env PostgreSQL credentials are correct.");
-                // Fallback
-                localStorage.removeItem('cart');
-                localStorage.removeItem('tableReserved'); 
-                window.location.href = 'dashboard.html';
+                alert("Order failed to sync with the cloud database. Please verify your Supabase status.");
+                submitBtn.disabled = false;
+                submitBtn.innerText = 'Confirm Order & Reserve';
             }
         });
     }
 
-    // --- AUTH FORM HANDLERS (Real Integration) ---
-    const loginForm = document.getElementById('login-form');
+    // --- AUTH FORM HANDLERS (Supabase Integration) ---
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
