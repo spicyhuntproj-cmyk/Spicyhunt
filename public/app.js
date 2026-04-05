@@ -395,6 +395,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- AUTH FORM HANDLERS (Supabase Integration) ---
+    const loginForm = document.getElementById('login-form');
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -441,8 +442,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error || 'Registration Failed');
 
-                alert('Royal Access Granted! Please sign in to begin.');
-                location.reload(); // Switch back to login
+                // AUTO-LOGIN: Immediately sign in and redirect
+                const loginRes = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const loginData = await loginRes.json();
+                
+                localStorage.setItem('token', loginData.token);
+                localStorage.setItem('user', JSON.stringify(loginData.user));
+                
+                alert('Royal Access Granted! Welcome to Spicy Hunt.');
+                window.location.href = 'index.html';
             } catch (err) {
                 alert(err.message);
                 toggleBtnLoading(submitBtn, false);
