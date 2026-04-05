@@ -240,17 +240,19 @@ window.addToCartPerfect = function(id, name, price) {
         cart.push({ id, name, price, qty });
     }
     
-    // UI FEEDBACK: Reveal the quantity selector ONLY after first add
-    const qtyContainer = document.getElementById(`qty-container-${id}`);
-    if (qtyContainer) {
-        qtyContainer.style.setProperty('display', 'flex', 'important');
-    }
-    const addBtn = document.getElementById(`add-btn-${id}`);
-    if (addBtn) {
-        addBtn.innerText = 'Add More';
-        addBtn.style.background = 'linear-gradient(135deg, #28a745 0%, #218838 100%)';
-        setTimeout(() => { addBtn.style.background = ''; }, 1000);
-    }
+    // UI FEEDBACK: Reveal the quantity selector INSTANTLY for better INP
+    requestAnimationFrame(() => {
+        const qtyContainer = document.getElementById(`qty-container-${id}`);
+        if (qtyContainer) {
+            qtyContainer.style.setProperty('display', 'flex', 'important');
+        }
+        const addBtn = document.getElementById(`add-btn-${id}`);
+        if (addBtn) {
+            addBtn.innerText = 'Add More';
+            addBtn.classList.add('btn-success-anim');
+            setTimeout(() => { addBtn.classList.remove('btn-success-anim'); }, 1000);
+        }
+    });
 
     localStorage.setItem('cart', JSON.stringify(cart));
     updateCartBadge();
@@ -387,5 +389,76 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = 'dashboard.html';
             }
         });
+    }
+
+    // --- AUTH FORM HANDLERS (Real Integration) ---
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const submitBtn = document.getElementById('login-submit');
+
+            toggleBtnLoading(submitBtn, true);
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Login Failed');
+
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                window.location.href = 'index.html';
+            } catch (err) {
+                alert(err.message);
+                toggleBtnLoading(submitBtn, false);
+            }
+        });
+    }
+
+    const regForm = document.getElementById('register-form');
+    if (regForm) {
+        regForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            const submitBtn = document.getElementById('register-submit');
+
+            toggleBtnLoading(submitBtn, true);
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Registration Failed');
+
+                alert('Royal Access Granted! Please sign in to begin.');
+                location.reload(); // Switch back to login
+            } catch (err) {
+                alert(err.message);
+                toggleBtnLoading(submitBtn, false);
+            }
+        });
+    }
+
+    function toggleBtnLoading(btn, isLoading) {
+        const text = btn.querySelector('.btn-text');
+        const spinner = btn.querySelector('.spinner-border');
+        if (isLoading) {
+            btn.disabled = true;
+            text.style.opacity = '0.3';
+            spinner.classList.remove('d-none');
+        } else {
+            btn.disabled = false;
+            text.style.opacity = '1';
+            spinner.classList.add('d-none');
+        }
     }
 });

@@ -58,33 +58,74 @@
         <div class="row w-100 justify-content-center">
             <div class="col-md-7 col-lg-5">
                 <div class="login-panel reveal visible" style="opacity: 1; transform: translateY(0);">
-                    <!-- Royal Crest Mockup -->
-                    <div class="text-center mb-5">
-                        <img src="royal_crest_gold.png" alt="Royal Crest" style="width: 80px; filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.3));" class="mb-4">
-                        <h2 class="brand-logo fs-2" style="color: var(--primary-color);">GUEST LOGIN</h2>
-                        <p class="text-muted small">ENTER THE ROYAL CULINARY ARCHIVE</p>
+                    <div id="login-section">
+                        <div class="text-center mb-5">
+                            <img src="royal_crest_gold.png" alt="Royal Crest" style="width: 80px; filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.3));" class="mb-4">
+                            <h2 class="brand-logo fs-2" style="color: var(--primary-color);">GUEST LOGIN</h2>
+                            <p class="text-muted small">ENTER THE ROYAL CULINARY ARCHIVE</p>
+                        </div>
+
+                        <form id="login-form">
+                            <div class="mb-4">
+                                <label class="form-label text-uppercase small fw-bold">Royal Email</label>
+                                <input type="email" id="login-email" class="form-control form-control-royal" placeholder="your@email.com" required>
+                            </div>
+                            <div class="mb-5">
+                                <label class="form-label text-uppercase small fw-bold">Secret Key</label>
+                                <input type="password" id="login-password" class="form-control form-control-royal" placeholder="••••••••" required>
+                            </div>
+                            
+                            <div class="text-center mb-4">
+                                <button type="submit" id="login-submit" class="btn btn-primary-custom w-100 py-3 rounded-pill fs-6 position-relative">
+                                    <span class="btn-text">Sign In to Feast</span>
+                                    <div class="spinner-border spinner-border-sm position-absolute d-none" style="top:35%; right:20px;"></div>
+                                </button>
+                            </div>
+                            
+                            <div class="text-center">
+                                <p class="text-muted small">
+                                    New to the Hunt? <a href="#" onclick="toggleAuth(event)" class="text-decoration-none fw-bold" style="color: var(--accent-color);">Request Access</a>
+                                </p>
+                            </div>
+                        </form>
                     </div>
 
-                    <form id="login-form">
-                        <div class="mb-4">
-                            <label class="form-label text-uppercase small fw-bold">Royal Email</label>
-                            <input type="email" class="form-control form-control-royal" placeholder="your@email.com" required>
+                    <!-- Registration Section (Hidden by Default) -->
+                    <div id="register-section" style="display: none;">
+                        <div class="text-center mb-5">
+                            <img src="royal_crest_gold.png" alt="Royal Crest" style="width: 80px; filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.3));" class="mb-4">
+                            <h2 class="brand-logo fs-2" style="color: var(--primary-color);">REQUEST ACCESS</h2>
+                            <p class="text-muted small">JOIN THE ROYAL CULINARY LEGACY</p>
                         </div>
-                        <div class="mb-5">
-                            <label class="form-label text-uppercase small fw-bold">Secret Key</label>
-                            <input type="password" class="form-control form-control-royal" placeholder="••••••••" required>
-                        </div>
-                        
-                        <div class="text-center mb-4">
-                            <button type="submit" class="btn btn-primary-custom w-100 py-3 rounded-pill fs-6">Sign In to Feast</button>
-                        </div>
-                        
-                        <div class="text-center">
-                            <p class="text-muted small">
-                                New to the Hunt? <a href="#" class="text-decoration-none fw-bold" style="color: var(--accent-color);">Request Access</a>
-                            </p>
-                        </div>
-                    </form>
+
+                        <form id="register-form">
+                            <div class="mb-4">
+                                <label class="form-label text-uppercase small fw-bold">Full Name</label>
+                                <input type="text" id="reg-name" class="form-control form-control-royal" placeholder="His Highness Arjun Singh" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label text-uppercase small fw-bold">Royal Email</label>
+                                <input type="email" id="reg-email" class="form-control form-control-royal" placeholder="your@email.com" required>
+                            </div>
+                            <div class="mb-5">
+                                <label class="form-label text-uppercase small fw-bold">Secret Key</label>
+                                <input type="password" id="reg-password" class="form-control form-control-royal" placeholder="Assign a password" required>
+                            </div>
+                            
+                            <div class="text-center mb-4">
+                                <button type="submit" id="register-submit" class="btn btn-primary-custom w-100 py-3 rounded-pill fs-6 position-relative">
+                                    <span class="btn-text">Submit Request</span>
+                                    <div class="spinner-border spinner-border-sm position-absolute d-none" style="top:35%; right:20px;"></div>
+                                </button>
+                            </div>
+                            
+                            <div class="text-center">
+                                <p class="text-muted small">
+                                    Already a Member? <a href="#" onclick="toggleAuth(event)" class="text-decoration-none fw-bold" style="color: var(--accent-color);">Sign In</a>
+                                </p>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -92,16 +133,21 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Use app.js for real auth logic -->
     <script src="app.js"></script>
     <script>
-        // REDIRECTION LOGIC ON SUBMIT (Mock bypass)
-        document.getElementById('login-form').addEventListener('submit', (e) => {
+        function toggleAuth(e) {
             e.preventDefault();
-            // Mock authentication
-            localStorage.setItem('token', 'mock_spicy_token');
-            localStorage.setItem('user', JSON.stringify({ name: 'Honored Guest', role: 'guest' }));
-            window.location.href = 'index.html';
-        });
+            const loginSection = document.getElementById('login-section');
+            const registerSection = document.getElementById('register-section');
+            if(loginSection.style.display === 'none') {
+                loginSection.style.display = 'block';
+                registerSection.style.display = 'none';
+            } else {
+                loginSection.style.display = 'none';
+                registerSection.style.display = 'block';
+            }
+        }
     </script>
 </body>
 </html>

@@ -280,3 +280,9 @@ h2.brand-logo {
     border-radius: 20px;
   }
 }
+
+.btn-success-anim {
+    background: linear-gradient(135deg, #28a745 0%, #218838 100%) !important;
+    transform: scale(0.98);
+    transition: all 0.1s ease;
+}
