@@ -164,12 +164,20 @@ async function loadMenu() {
     if (!container) return;
     updateCartBadge();
     
-    let items = mockMenu.filter(item => item.image_url && item.image_url !== '');
+    let items = [];
+    try {
+        const res = await fetch('/api/menu');
+        items = await res.json();
+    } catch(e) {
+        console.error("Menu Sync Error:", e);
+        return;
+    }
+
     const categories = {};
     items.forEach(item => {
         if (!categories[item.category]) categories[item.category] = [];
         categories[item.category].push(item);
-        if (!menuQtyMap[item.id]) menuQtyMap[item.id] = 0; // Start at 0 (internal)
+        if (!menuQtyMap[item.id]) menuQtyMap[item.id] = 0; 
     });
 
     const order = ['Starters', 'Mains (Vegetarian)', 'Mains (Non-Vegetarian)', 'Breads & Sides', 'Desserts', 'Beverages'];
