@@ -45,15 +45,15 @@ module.exports = {
 
     // Dashboard Mappings
     if (text.toLowerCase().includes('select id, total_price')) {
-      const { data, error } = await supabase.from('food_orders').select('id, total_price as total, status, created_at as date').eq('user_id', params[0]).order('created_at', { ascending: false });
+      const { data, error } = await supabase.from('food_orders').select('id, total:total_price, status, date:created_at').eq('user_id', params[0]).order('created_at', { ascending: false });
       if (error) throw error;
-      return { rows: data };
+      return { rows: data || [] };
     }
 
     if (text.toLowerCase().includes('select id, booking_date')) {
-      const { data, error } = await supabase.from('table_reservations').select('id, booking_date as date, booking_time as time, guests, occasion, status').eq('user_id', params[0]).order('booking_date', { ascending: false });
+      const { data, error } = await supabase.from('table_reservations').select('id, date:booking_date, time:booking_time, guests, occasion, status').eq('user_id', params[0]).order('booking_date', { ascending: false });
       if (error) throw error;
-      return { rows: data };
+      return { rows: data || [] };
     }
 
     if (text.toLowerCase().includes('insert into table_reservations')) {
