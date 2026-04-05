@@ -33,7 +33,7 @@ module.exports = {
         role: params[3]
       }).select();
       if (error) throw error;
-      return { rows: data };
+      return { rows: data || [] };
     }
 
     // Menu Mapping
@@ -65,7 +65,7 @@ module.exports = {
         occasion: params[4]
       }).select();
       if (error) throw error;
-      return { rows: data };
+      return { rows: data || [] };
     }
 
     if (text.toLowerCase().includes('insert into food_orders')) {
@@ -75,7 +75,7 @@ module.exports = {
         status: params[2]
       }).select();
       if (error) throw error;
-      return { rows: data };
+      return { rows: data || [] };
     }
 
     if (text.toLowerCase().includes('insert into food_order_items')) {
@@ -86,7 +86,7 @@ module.exports = {
         price_at_time: params[3]
       }).select();
       if (error) throw error;
-      return { rows: data };
+      return { rows: data || [] };
     }
 
     if (text.toLowerCase().includes('update table_reservations set status')) {
