@@ -56,12 +56,7 @@ function enforceAuthOnBookingPages() {
 
 // --- SMART SEQUENTIAL FLOW LOGIC ---
 window.handleCheckoutRedirection = function() {
-    const tableBooked = localStorage.getItem('tableReserved');
-    if (tableBooked === 'true' || tableBooked === true) {
-        window.location.href = 'checkout.html';
-    } else {
-        window.location.href = 'booking.html?origin=menu';
-    }
+    window.location.href = 'booking.html'; // Step 2: Go to Table Booking
 };
 
 // --- REAL-TIME DASHBOARD LOGIC ---
@@ -334,10 +329,10 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             
             const payload = {
-                date: document.getElementById('checkin').value,
-                time: document.getElementById('checkoutDate').value, // Hijacked this old ID for Time
+                date: document.getElementById('booking-date').value,
+                time: document.getElementById('booking-time').value,
                 guests: document.getElementById('guests').value,
-                occasion: document.getElementById('roomType').value // Hijacked this old ID for Occasion
+                occasion: document.getElementById('occasion').value
             };
 
             try {
@@ -350,12 +345,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(!res.ok) throw new Error("SQL connection issue.");
                 
                 localStorage.setItem('tableReserved', 'true');
-                window.location.href = 'menu.html';
+                window.location.href = 'checkout.html'; // Step 3: Go to Checkout
             } catch(e) {
-                alert("Failed to book: Ensure your .env PostgreSQL credentials are correct.");
+                console.error("Booking Error:", e);
                 // Fallback for demo so user isn't fully stuck if DB is broken
                 localStorage.setItem('tableReserved', 'true');
-                window.location.href = 'menu.html';
+                window.location.href = 'checkout.html';
             }
         });
     }

@@ -60,11 +60,22 @@
         </div>
     </nav>
 
+    <!-- PERFECTED PROGRESS INDICATOR -->
+    <div class="container mt-5">
+        <div class="booking-progress">
+            <div class="progress-step">1. Feast Selection</div>
+            <div class="progress-line"></div>
+            <div class="progress-step active">2. Table Reservation</div>
+            <div class="progress-line"></div>
+            <div class="progress-step">3. Royal Checkout</div>
+        </div>
+    </div>
+
     <!-- Table Booking Form -->
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <div class="booking-card">
+                <div class="booking-card" style="margin-top: 40px;">
                     <div class="text-center mb-5">
                         <h2 class="brand-logo mb-2">Secure Your Table</h2>
                         <p class="text-muted">Join us for an unforgettable spice-led adventure.</p>
@@ -106,13 +117,13 @@
                         <div class="row g-4 mb-5">
                              <div class="col-md-12">
                                 <label class="form-label fw-bold text-uppercase small" style="letter-spacing: 1px;">Full Name</label>
-                                <input type="text" class="form-control" placeholder="Royal Guest Name" required>
+                                <input type="text" class="form-control" placeholder="Royal Guest Name" required id="guest-name">
                             </div>
                         </div>
 
                         <div class="text-center">
-                            <button type="submit" class="btn btn-primary-custom btn-lg w-100">Next: Pre-order Your Flavors</button>
-                            <p class="mt-3 text-muted small"><i class="bi bi-info-circle"></i> Redirecting to menu for meal selection after table confirmation.</p>
+                            <button type="submit" class="btn btn-primary-custom btn-lg w-100">Next: Review & Checkout</button>
+                            <p class="mt-3 text-muted small"><i class="bi bi-info-circle"></i> Finalizing your royal feast and table reservation.</p>
                         </div>
                     </form>
                 </div>
